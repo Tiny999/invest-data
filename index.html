@@ -9,7 +9,7 @@
     <style>
         table{
             border: 1px solid gray;
-            margin-top: 50px;
+            margin-bottom: 70px;
             width: 100%;
         }
 
@@ -21,6 +21,10 @@
 
         thead{
             border-bottom: 1px solid gray;
+        }
+
+        h3{
+            text-align: center;
         }
 
         input{
@@ -40,7 +44,8 @@
         <button type="submit">Submit</button>
     </form>
 
-    <table>
+    <h3>Reports</h3>
+    <table id="reportTable">
         <thead>
             <tr>
                 <th>ID</th>
@@ -51,6 +56,17 @@
                 <th>Total Return</th>
                 <th>Total Withdrawal</th>
                 <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <h3>Summary</h3>
+    <table id="summary">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -74,19 +90,18 @@
 
             const month = document.getElementById('month').value.toLowerCase();
             const year = document.getElementById('year').value
-            const table = document.querySelector('table');
-
-
-            console.log(month.toLowerCase(), year)
+            const reportTable = document.querySelector('#reportTable');
+            const summaryTable = document.querySelector('#summary')
 
             try{
                 const res = await axiosI.get(`https://kenfarms.ng/api/statistics/${month}/${year}`);
            const data = res.data[0].data;
-           summary = res.data[1];
+           summary = res.data[1].summary;
 
            console.log(summary)
 
-           const tbody = document.querySelector('tbody');
+           const tbody = reportTable.querySelector('tbody');
+           const summaryTbody = summaryTable.querySelector('tbody');
 
            for(const obj in data){
                 const row = document.createElement('tr');
@@ -108,6 +123,25 @@
 
                 tbody.appendChild(row)
            }
+
+           let finalObj = {}
+            summary.forEach(obj => {
+                finalObj = {
+                    ...finalObj, 
+                    ...obj
+                }
+            });
+
+            for (const item in finalObj){
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${item}</td>
+                    <td>${finalObj[item]}</td>
+                `;
+
+                summaryTbody.appendChild(row);
+            }
 
         //    table.appendChild(tbody);
 
