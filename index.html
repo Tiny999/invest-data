@@ -35,6 +35,10 @@
             margin-top: 15px;
             border: 1px solid black;
         }
+
+        .t-center{
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -56,17 +60,6 @@
                 <th>Total Return</th>
                 <th>Total Withdrawal</th>
                 <th>Balance</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <h3>Summary</h3>
-    <table id="summary">
-        <thead>
-            <tr>
-                <th>Key</th>
-                <th>Value</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -94,62 +87,42 @@
             const summaryTable = document.querySelector('#summary')
 
             try{
+                const tbody = reportTable.querySelector('tbody');
+                tbody.innerHTML='<td colspan="8" class="t-center">Loading Data...</td>'
+
                 const res = await axiosI.get(`https://kenfarms.ng/api/statistics/${month}/${year}`);
-           const data = res.data[0].data;
-           summary = res.data[1].summary;
+                console.log(res)
+                const data = res.data.data;
 
-           console.log(summary)
+                
+                tbody.innerHTML=''
 
-           const tbody = reportTable.querySelector('tbody');
-           const summaryTbody = summaryTable.querySelector('tbody');
+                for(const obj in data){
+                        const row = document.createElement('tr');
 
-           for(const obj in data){
-                const row = document.createElement('tr');
-
-                const startDate = new Date(data[obj].start_date).yyyymmdd();
-                const endDate = new Date(data[obj].end_date).yyyymmdd();
+                        const startDate = new Date(data[obj].start_date).yyyymmdd();
+                        const endDate = new Date(data[obj].end_date).yyyymmdd();
 
 
-                row.innerHTML=`
-                    <td>${data[obj].client_id}</td>
-                    <td>${data[obj].capital.toLocaleString()}</td>
-                    <td>${data[obj].plan}</td>
-                    <td>${startDate}</td>
-                    <td>${endDate}</td>
-                    <td>${data[obj].total_return.toLocaleString()}</td>
-                    <td>${data[obj].total_withdrawal.toLocaleString()}</td>
-                    <td>${data[obj].balance.toLocaleString()}</td>
-                `;
+                        row.innerHTML=`
+                            <td>${data[obj].client_id}</td>
+                            <td>${data[obj].capital.toLocaleString()}</td>
+                            <td>${data[obj].plan}</td>
+                            <td>${startDate}</td>
+                            <td>${endDate}</td>
+                            <td>${data[obj].total_return.toLocaleString()}</td>
+                            <td>${data[obj].total_withdrawal.toLocaleString()}</td>
+                            <td>${data[obj].balance.toLocaleString()}</td>
+                        `;
 
-                tbody.appendChild(row)
-           }
-
-           let finalObj = {}
-            summary.forEach(obj => {
-                finalObj = {
-                    ...finalObj, 
-                    ...obj
+                        tbody.appendChild(row)
                 }
-            });
 
-            for (const item in finalObj){
-                const row = document.createElement('tr');
+                } catch(err){
+                    alert('Something went wrong. Try again')
+                }
 
-                row.innerHTML = `
-                    <td>${item}</td>
-                    <td>${finalObj[item]}</td>
-                `;
-
-                summaryTbody.appendChild(row);
-            }
-
-        //    table.appendChild(tbody);
-
-            } catch(err){
-                console.log(err)
-            }
-
-                   })
+        })
     </script>
 </body>
 </html>
